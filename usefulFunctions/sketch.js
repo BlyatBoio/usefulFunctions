@@ -1,3 +1,4 @@
+let newCube;
 function setup(){
   createCanvas(windowWidth, windowHeight);
   Console = new consoleClass();
@@ -6,6 +7,7 @@ function setup(){
   consoleInput.size((width/5)-((2*Console.logSpacing)+10), 30);
   defineThemes();
   camera = new cameraC(0, 0, 0, 60);
+  newCube = createCube(0, 0, 1);
 }
 
 function draw(){
@@ -14,6 +16,7 @@ function draw(){
   runtime ++;
   //camera.drawPointToScreen(0, 0, 1);
   //camera.drawPointToScreen(runtime/50, 0, 0);
+  /*
   camera.drawPointToScreen(0, 0, 1);
   camera.drawPointToScreen(1, 0, 1);
   camera.drawPointToScreen(1, 1, 1);
@@ -22,8 +25,11 @@ function draw(){
   camera.drawPointToScreen(1, 0, 2);
   camera.drawPointToScreen(1, 1, 2);
   camera.drawPointToScreen(0, 1, 2);
+  */
+  newCube.drawSelf();
   onScreenConsole();
   mouseScrolled = 0;
   camera.constrainSelf();
   camera.mouseControls();
+  camera.keyboardControls();
 }

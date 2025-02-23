@@ -12,9 +12,9 @@ function onScreenConsole()
 	textWrap("Char")
 	textSize(Console.logTextSize);
 	setThemeFill(0);
-	consoleInput.style('background', currentColorTheme.fillColors[1])
-	consoleInput.style('color', currentColorTheme.textColors[0])
-	consoleInput.style('border', currentColorTheme.fillColors[0])
+  consoleInput.style("background-color", currentColorTheme.fillColors[1]);
+  consoleInput.style("border", currentColorTheme.fillColors[1]);
+  consoleInput.style("color", currentColorTheme.textColors[0]);
 	switch (consolePosition)
 	{
 		case "Left":
@@ -116,7 +116,7 @@ function runInputComand()
 			location.reload();
 			break;
 		case "saveLogs":
-			Console.log("Logs Saved!");
+			Console.log("Logs Saved To C:/dowloads/DebugLog_" + timestamp());
 			Console.saveLogs();
 			break;
 		case "setTheme":
@@ -129,27 +129,19 @@ function runInputComand()
 			break;
 		case "set":
 			let saveArgs1 = comandArgs[0];
-			eval(comandArgs[0] + "=" + comandArgs[1]);
+			eval(comandArgs[0]+"="+comandArgs[1]);
 			Console.log("Set: " + saveArgs1 + " To: " + comandArgs[1]);
 			break;
 		case "close":
 			window.close();
 			break;
-		case "help":
-			Console.log("Possible Commands:");
-			Console.log("get - logs the value of a given variable");
-			Console.log("run - runs the given function and logs the output");
-			Console.log("say - logs the literal string of what is inputed");
-			Console.log("clear - clears the console");
-			Console.log("reload - reloads the window / resets the page to default");
-			Console.log("saveLogs - save the current logs as a .txt file");
-			Console.log("setTheme - sets the current theme (ex: purple)");
-			Console.log("screenshot - saves the current state of the canvas as a .png file");
-			Console.log("set - sets a given variable to the given value");
-			Console.log("(ex: ruintime 100 would set the variable runtime to 100)");
-			Console.log("close - closes the current window");
-			Console.log("help - provides this current list of options");
-			break;	
+    case "solve":
+      let eqn = eval(args);
+      Console.log("Result: " + args + " = " + eqn);
+      break;
+		case "FPS":
+			Console.log("FPS: " + frameCount());
+			break;
 		default:
 			Console.error("Improper Key word Imputed: ");
 			Console.error(cmd);
@@ -182,8 +174,7 @@ class consoleClass
 	{
 		this.logs.push("ERROR: " + str(args));
 	}
-	clear()
-	{
+	clear(){
 		this.logs = [];
 		logStartPos = 0;
 	}

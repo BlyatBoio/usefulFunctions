@@ -33,7 +33,7 @@ function defineThemes(){
   transparentTheme = new colorTheme(
     "Transparent",
 		[color(0, 0, 0, 0)],
-		[color(50), color(100), color(255, 70, 70)],
+		[color(250), color(100), color(255, 70, 70)],
 		[color(0), color(0), color(0)],
 		[color(100, 100, 100, 100), color(80), color(120)],
 		[color(0)],

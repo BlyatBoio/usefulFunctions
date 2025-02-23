@@ -53,46 +53,39 @@ function del(a, i2)
   return arr1;
 }
 
-function drawPolygon(vertecies)
-{
+function drawPolygon(vertecies){
   // begin / end shape draws lines and fills pixels in between vertecies
   beginShape();
 
   // itterate over the provided vertecies
-  for (let i = 0; i < vertecies.length; i++)
-  {
+  for(let i = 0; i < vertecies.length; i++){
     vertex(vertecies[i].x, vertecies[i].y);
   }
   vertex(vertecies[0].x, vertecies[0].y); // close the shape
   endShape();
 }
 
-function mouseWheel(event)
-{
+function mouseWheel(event){
   mouseScrolled = event.delta;
   mouseHasScrolled = true;
   scrollTimer = 0;
 }
 
-function timestamp()
-{
-  let time = month() + ":" + day() + ":" + hour() + ":" + minute() + ":" + second();
+function timestamp(){
+  let time = month()+":"+day()+":"+hour()+":"+minute()+":"+second();
   return time;
 }
 
-function tDist(x, x2)
-{
-  if (x > x2) return dist(x, 0, x2, 0);
+function tDist(x, x2){
+  if(x > x2) return dist(x, 0, x2, 0);
   return -dist(x, 0, x2, 0);
 }
 
 // arrayCopy commonly runs into obscure issues, simpler function to do the same task
 // untested for not 1d arrays
-function copyArray(array)
-{
+function copyArray(array){
   let newArr = Array(array.length);
-  for (let i = 0; i < array.length; i++)
-  {
+  for(let i = 0; i < array.length; i++){
     newArr[i] = array[i];
   }
   return newArr;

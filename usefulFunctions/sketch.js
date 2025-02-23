@@ -1,4 +1,10 @@
 let newCube;
+let m1;
+let m2;
+
+let renderedObjects = [];
+let allObjects = [];
+
 function setup(){
   createCanvas(windowWidth, windowHeight);
   Console = new consoleClass();
@@ -7,29 +13,22 @@ function setup(){
   consoleInput.size((width/5)-((2*Console.logSpacing)+10), 30);
   defineThemes();
   camera = new cameraC(0, 0, 0, 60);
-  newCube = createCube(0, 0, 1);
+  newCube = createCube(0, 0, 2);
+  newCube = createCube(5, 0, 2);
+  worldForward = new Direction(0, 0, 0);
 }
 
 function draw(){
   //themeBackground();
-  background(200)
+  background(0)
   runtime ++;
-  //camera.drawPointToScreen(0, 0, 1);
-  //camera.drawPointToScreen(runtime/50, 0, 0);
-  /*
-  camera.drawPointToScreen(0, 0, 1);
-  camera.drawPointToScreen(1, 0, 1);
-  camera.drawPointToScreen(1, 1, 1);
-  camera.drawPointToScreen(0, 1, 1);
-  camera.drawPointToScreen(0, 0, 2);
-  camera.drawPointToScreen(1, 0, 2);
-  camera.drawPointToScreen(1, 1, 2);
-  camera.drawPointToScreen(0, 1, 2);
-  */
-  newCube.drawSelf();
+  camera.updateScreen();
   onScreenConsole();
   mouseScrolled = 0;
   camera.constrainSelf();
+  newCube.addPosition(0, 0, 0);
   camera.mouseControls();
   camera.keyboardControls();
+  renderedObjects = [];
+  //rect(random(100, 200), 200, 100);
 }

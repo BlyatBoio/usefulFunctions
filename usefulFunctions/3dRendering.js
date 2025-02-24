@@ -10,58 +10,45 @@ class cameraC{
     this.zRotation = 0; // currently unused, would be more of a head tilt
     this.FOV = FOV;
 
-    this.forward = new Direction(this.xRotation, this.yRotation, this.zRotation);
+    this.hasMoved = false;
+
+    this.forward = new Direction(this.xRotation, this.yRotation);
   }
   constrainSelf(){
-    // constrain horizontal rotation
-    if(this.xRotation >= 180) this.xRotation = -179;
-    if(this.xRotation <= -180) this.xRotation = 179;
-    
-    // constrain vertical rotation
-    if(this.yRotation >= 180) this.yRotation = -179;
-    if(this.yRotation <= -180) this.yRotation = 179;
   }
   mouseControls(){
-    let saveX = this.xRotation;
-    let saveY = this.yRotation;
 
-    this.xRotation += movedX/200;
-    this.yRotation += movedY/200;
+    let xm = movedX/1000 * deltaTime;
+    let ym = movedY/1000 * deltaTime;
 
-    this.forward.rotateBy(tDist(saveX, this.xRotation), tDist(saveY, this.yRotation), 0);
+    this.xRotation -= ym;
+    this.yRotation -= xm;
+
+
+    this.forward.rotateBy(ym, xm);
   }
   keyboardControls(){
-    let moveVec = createVector(0, 0);
+    let moveVec = createVector(0, 0, 0)
     // define a local vector
-    let xMultVector = createVector(0.1, 0.1); // x movements are multiplied by the localization vector
-    let yMultVector = createVector(0.1, 0.1); // y movements are multiplied by the localization vector
-    xMultVector.rotate(this.xRotation);
-    yMultVector.rotate(this.yRotation);
     if(keyIsDown(87)){
-      //moveVec.x += xMultVector.z;
-      //moveVec.z += xMultVector.x;
-      moveVec.z += 0.1;
+      this.localMove("Forward", 0.1);
     }
-    if(keyIsDown(83)){
-      //moveVec.x -= xMultVector.z;
-      //moveVec.z -= xMultVector.x;
-      moveVec.z -= 0.1;
+    if(keyIsDown(83)){      
+      this.localMove("Back", 0.1);
     }
     if(keyIsDown(65)){
-      // moveVec.x -= xMultVector.x;
-      // moveVec.z -= xMultVector.z;
-      moveVec.x -= 0.1;
+      this.localMove("Left", 0.1);
     }
     if(keyIsDown(68)){
-      // moveVec.x += xMultVector.x;
-      // moveVec.z += xMultVector.z;
-      moveVec.x += 0.1;
+      this.localMove("Right", 0.1);
     }
     if(keyIsDown(32)){
       moveVec.y -= 0.1;
+      this.hasMoved = true;
     }
     if(keyIsDown(16)){
       moveVec.y += 0.1;
+      this.hasMoved = true;
     }
     this.x += moveVec.x;
     this.z += moveVec.z;
@@ -69,37 +56,73 @@ class cameraC{
 
     //console.log("X: " + this.x +"\nY: " + this.y + "\nZ: " + this.z);
   }
+  localMove(direction, amnt){
+    this.hasMoved = true;
+    let appVec = this.forward.applicationVector;
+    let xMove = 0;
+    let zMove = 0;
+    switch(direction){
+      case "Forward":
+        this.x += appVec.x * amnt;
+        this.z += appVec.z * amnt;
+        break;
+      case "Back":
+        this.x -= appVec.x * amnt;
+        this.z -= appVec.z * amnt;
+        break;
+      case "Right":
+        xMove = 0;
+        zMove = 0;
+        this.forward.rotateBy(0, PI/2);
+        xMove = appVec.x;
+        zMove = appVec.z;
+        this.x += xMove * amnt;
+        this.z += zMove * amnt;
+        this.forward.rotateBy(0, -PI/2);
+        break;
+      case "Left":
+        xMove = 0;
+        zMove = 0;
+        this.forward.rotateBy(0, -PI/2);
+        xMove = appVec.x;
+        zMove = appVec.z;
+        this.x += xMove * amnt;
+        this.z += zMove * amnt;
+        this.forward.rotateBy(0, PI/2);
+        break;
+    }
+  }
   distToCamera(x, y, z){
     return dist3D(x, y, z, this.x, this.y, this.z)
     //return dist(x, z, this.x, this.z)
   }
   updateScreen(){
+    background(0)
     let resolution = 20;
-    let FOV = 20;
+    let FOV = this.FOV;
     noStroke();
     for(let x = 0; x < width/resolution+1; x++){
       for(let y = 0; y < height/resolution+1; y++){
         let castPosition = createVector(this.x, this.y, this.z);
-        let rotAngle = new Direction(this.forward.angleX, this.forward.angleY, this.forward.angleZ);
+        let rotAngle = new Direction(this.forward.angleX, this.forward.angleY);
         let xRot = map(x, 0, width/resolution+1, -FOV, FOV) * (PI/180);
         let yRot = map(y, 0, height/resolution+1, -FOV, FOV) * (PI/180);
-        rotAngle.rotateBy(this.xRotation + xRot, this.yRotation + yRot, 0);
-        let r = new raycast(castPosition.x, castPosition.y, castPosition.z, rotAngle, 0.5, 100);
+        rotAngle.rotateBy(yRot, xRot, 0);
+        let r = new raycast(castPosition.x, castPosition.y, castPosition.z, rotAngle, 0.5, 50);
         let c = r.checkInteraction();
         if(c != false) {
           fill(c);
           rect(x * resolution, y * resolution, resolution);
+          push();
+          stroke(100);
+          translate(400 + x * 10, 200 + y * 10);
+          rotate(rotAngle.angleX);
+          line(0, 0, 10, 0);
+          pop();
         }
-        /*
-        push();
-        stroke(255);
-        translate(400 + x * 10, 200 + y * 10);
-        rotate(rotAngle.angleX);
-        line(0, 0, 10, 0);
-        pop();
-        */
       }
     }
+    this.hasMoved = false;
   }
 }
 
@@ -130,12 +153,30 @@ class raycast {
       for(let i = 0; i < allObjects.length; i++){
         // if the checkPosition colides with an object
         if(allObjects[i].isColiding(this.checkX, this.checkY, this.checkZ) == true){
-          // add that object to the rendered objects array
-          this.hasHitObject = true;
-          renderedObjects.push(allObjects[i]);
+          if(allObjects[i].objType == "Cube"){
+          // fill with stroke color if it is a border
+          let d = 3 - dist(this.checkX, this.checkZ, this.startX, this.startZ) / 10;
+          let xD = (allObjects[i].w/2);
+          let yD = (allObjects[i].h/2);
+          let zD = (allObjects[i].l/2);
+
+          let xc = 0;
+          let yc = 0;
+          let zc = 0;
+          if(dist(this.checkX, 0, allObjects[i].x + xD, 0) >= xD - 0.5) xc = 1;
+          if(dist(this.checkY, 0, allObjects[i].y + yD, 0) >= yD - 0.5) yc = 1;
+          if(dist(this.checkZ, 0, allObjects[i].z + zD, 0) >= zD - 0.5) zc = 1;
+
+          if(xc + yc + zc >= 2) return 100 * d;
+
+
           // return the distance from the starting location to the interaction point
-          let d = 100 - dist(this.checkX, this.checkZ, this.startX, this.startZ)
           return color(allObjects[i].r * d, allObjects[i].g * d, allObjects[i].b * d);
+          }
+          else{
+            let d = 2 - dist(this.checkX, this.checkZ, this.startX, this.startZ) / 10;
+            return color(allObjects[i].Cr * d, allObjects[i].Cg * d, allObjects[i].Cb * d);
+          }
         }
       }
       this.currentSteps ++;
@@ -150,39 +191,29 @@ class raycast {
 }
 
 class Direction {
-  constructor(angleX, angleY, angleZ){
+  constructor(angleX, angleY){
     // define starting angles
-    this.angleX = angleX;
-    this.angleY = angleY;
-    this.angleZ = angleZ;
+    this.angleX = 0;
+    this.angleY = 0;
     // define vectors
     this.applicationVector = createVector(0, 0, 0); // starts with 0 momentum / direction
     this.xRotationVector = createVector(1, 0);
     this.yRotationVector = createVector(1, 0);
-    this.zRotationVector = createVector(1, 0);
+    this.zRotationVector = createVector(0, 1);
 
-    // apply angles individualy as they would otherwise have unwanted effects
-    this.xRotationVector.rotate(angleX);
-    this.yRotationVector.rotate(angleY);
-    this.zRotationVector.rotate(angleZ);
-
-    // apply all values to the final vector
-    this.applicationVector.x = this.xRotationVector.x;
-    this.applicationVector.y = this.yRotationVector.x;
-    this.applicationVector.z = this.zRotationVector.x;
+    this.rotateBy(angleX, angleY);
   }
-  rotateBy(angleX, angleY, angleZ){
-    this.angleX = angleX;
-    this.angleY = angleY;
-    this.angleZ = angleZ;
+  rotateBy(angleX, angleY){
+    this.angleX += angleX;
+    this.angleY += angleY;
     // apply angles individualy 
     this.xRotationVector.rotate(angleX);
     this.yRotationVector.rotate(angleY);
-    this.zRotationVector.rotate(angleZ);
+    this.zRotationVector.rotate(angleY);
 
     // apply all values to the final vector
-    this.applicationVector.x = this.xRotationVector.x;
-    this.applicationVector.y = this.yRotationVector.x;
+    this.applicationVector.x = this.yRotationVector.x;
+    this.applicationVector.y = this.xRotationVector.x;
     this.applicationVector.z = this.zRotationVector.x;
   }
   getX(){
@@ -217,6 +248,7 @@ class object3D{
     this.h = -tDist(this.y, this.vertecies[2].y);
     this.l = -tDist(this.z, this.vertecies[4].z);
     colorMode(RGB);
+    this.objType = "Cube";
     this.r = random(0, 255);
     this.g = random(0, 255);
     this.b = random(0, 255);
@@ -250,6 +282,24 @@ class object3D{
   }
 }
 
+class sphere3D{
+  constructor(x, y, z, r){
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.r = r;
+    this.objType = "Sphere";  
+    colorMode(RGB);
+    this.Cr = random(0, 255);
+    this.Cg = random(0, 255);
+    this.Cb = random(0, 255);
+    allObjects.push(this);
+  }
+  isColiding(x, y, z){
+    return abs(dist3D(x, y, z, this.x, this.y, this.z)) < this.r;
+  }
+}
+
 function cubeCube(x, y, z, w, h, l, x2, y2, z2, w2, h2, l2){
   if(
     (x + w > x2 && x2 + w2 > x) && // x collisions
@@ -273,7 +323,7 @@ function relativeToCenter(x, y){
 }
 
 function createCube(startX, startY, startZ){
-  let cubeSize = 2;
+  let cubeSize = 7;
   let v1 = new vertex3D(startX, startY, startZ);
   let v2 = new vertex3D(startX+cubeSize, startY, startZ);
   let v3 = new vertex3D(startX+cubeSize, startY+cubeSize, startZ);
@@ -287,7 +337,7 @@ function createCube(startX, startY, startZ){
 }
 
 function dist3D(x, y, z, x2, y2, z2){
-  return tDist(x, 0, x2, 0) + tDist(y, 0, y2, 0) + tDist(z, 0, z2, 0);
+  return abs(tDist(x, x2)) + abs(tDist(y, y2)) + abs(tDist(z, z2));
 }
 
 function degToRad(a){

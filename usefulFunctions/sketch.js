@@ -12,29 +12,31 @@ function setup(){
   consoleInput.position(Console.logSpacing, height - 50);
   consoleInput.size((width/5)-((2*Console.logSpacing)+10), 30);
   defineThemes();
-  camera = new cameraC(0, 0, 0, 40);
-  //createCube(0, 0, 2);
-  newCube = createCube(15, 0, 2);
-  //new sphere3D(10, 5, 0, 1);
+  camera = new cameraC(0, 0, 0, 60);
+  createCube(0, -4, 2, 7, 7, 3);
+  createCube(0, 0, 0, 20, 1, 20);
+  createCube(10, -10, 5, 5, 5, 5);
+  newCube = createCube(15, 0, 2, 10, 10, 10);
+  //new sphere3D(10, 5, 0, 3);
   worldForward = new Direction(0, 0, 0);
   camera.updateScreen();
 }
 
 function draw(){
   //themeBackground();
-  runtime ++;
-   camera.updateScreen();
-  //onScreenConsole();
+  runtime ++; // update runtime
+  noStroke();
+  camera.updateScreen();
+  onScreenConsole();
   mouseScrolled = 0;
-  camera.constrainSelf();
   newCube.addPosition(0, 0, 0);
   camera.mouseControls();
   camera.keyboardControls();
-  //renderedObjects = [];
-  //rect(random(100, 200), 200, 100);
-
   // top down view of scene
-  /*
+  // view2D();
+}
+
+function view2D(){
   fill(100);
   rect(500 + (50 * allObjects[0].x), 500 + (50 * allObjects[0].y), 50*7);
   fill(255);
@@ -56,5 +58,4 @@ function draw(){
   rotate(degToRad(-60));
   line(0, 0, 50, 0);
   pop();
-  */
 }

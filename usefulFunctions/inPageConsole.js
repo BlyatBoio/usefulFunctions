@@ -19,7 +19,7 @@ function onScreenConsole()
 	{
 		case "Left":
 			rect(0, 0, width / 5, height);
-			for (let i = logStartPos; i < Console.logs.length - logStartPos; i++)
+			for (let i = logStartPos; i < Console.logs.length; i++)
 			{
 				let errorCheck = Console.logs[i].split(":");
 				if (errorCheck[0] == "ERROR") setThemeText(2);
@@ -50,7 +50,7 @@ function onScreenConsole()
 			break;
 		case "Top":
 			rect(0, 0, width, height / 5);
-			for (let i = logStartPos; i < Console.logs.length - logStartPos; i++)
+			for (let i = logStartPos; i < Console.logs.length; i++)
 			{
 				if (Console.logs[i][0] == "E" && Console.logs[i][0] == "R" && Console.logs[i][0] == "R") setThemeText(2);
 				else setThemeText(0);
@@ -65,7 +65,7 @@ function onScreenConsole()
 			break;
 		case "Bottom":
 			rect(0, height * (4 / 5), width, height / 5);
-			for (let i = logStartPos; i < Console.logs.length - logStartPos; i++)
+			for (let i = logStartPos; i < Console.logs.length; i++)
 			{
 				if (Console.logs[i][0] == "E" && Console.logs[i][0] == "R" && Console.logs[i][0] == "R") setThemeText(2);
 				else setThemeText(0);
